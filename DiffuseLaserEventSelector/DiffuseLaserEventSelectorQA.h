@@ -34,6 +34,7 @@ class DiffuseLaserEventSelectorQA : public SubsysReco
   unsigned int m_pad = 999;
    int m_timebin = 999;
   unsigned int m_adc = 0;
+  unsigned int n_event = 0;
   
   float m_hit_x = 0;
   float m_hit_y = 0;

@@ -50,7 +50,7 @@ int DiffuseLaserEventSelectorQA::Init(PHCompositeNode* /*topNode*/)
         return Fun4AllReturnCodes::ABORTRUN;
       }
 
-      m_tree = new TTree("DiffuseLaserEventSelectorQA", "Diffuse laser events");
+      m_tree = new TTree("diffuse_laser_hit_tree", "Diffuse laser events");
       m_tree->Branch("isLaserEvent", &m_isLaserEvent, "m_isLaserEvent/O");
       m_tree->Branch("layer", &m_layer, "m_layer/I");
       m_tree->Branch("sector", &m_sector, "m_sector/I");
@@ -58,9 +58,10 @@ int DiffuseLaserEventSelectorQA::Init(PHCompositeNode* /*topNode*/)
       m_tree->Branch("pad", &m_pad, "m_pad/I");
       m_tree->Branch("timebin", &m_timebin, "m_timebin/I");
       m_tree->Branch("adc", &m_adc, "m_adc/I");
+      m_tree->Branch("event", &n_event, "n_event/i");
 
   }
-
+  n_event= 1;
   //std::cout << "DiffuseLaserEventSelectorQA::Init - Initialization complete" << std::endl;
 
   return Fun4AllReturnCodes::EVENT_OK;
@@ -84,6 +85,7 @@ int DiffuseLaserEventSelectorQA::process_event(PHCompositeNode* /*topNode*/)
 {
 
   TrkrHitSetContainer::ConstRange all_hitsets = hitmap->getHitSets();
+  
   for (TrkrHitSetContainer::ConstIterator hitsetiter = all_hitsets.first;
        hitsetiter != all_hitsets.second;
        ++hitsetiter)
@@ -113,9 +115,9 @@ int DiffuseLaserEventSelectorQA::process_event(PHCompositeNode* /*topNode*/)
 
       m_tree->Fill();
     }
-
-    
   }
+  
+  n_event++;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 //--------------------------------------------------------------------------------

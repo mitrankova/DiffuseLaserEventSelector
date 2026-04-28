@@ -2,6 +2,8 @@
 
 #include <tpc/LaserEventInfo.h>
 
+#include <ffaobjects/EventHeader.h>
+
 #include <fun4all/Fun4AllReturnCodes.h>
 
 #include <phool/PHCompositeNode.h>
@@ -29,8 +31,16 @@ int DiffuseLaserEventSelector::process_event(PHCompositeNode* topNode)
     return Fun4AllReturnCodes::DISCARDEVENT;
   }
 
+  EventHeader *eventHeader = findNode::getClass<EventHeader>(topNode, "EventHeader");
+  if (!eventHeader)
+  {
+    std::cout << PHWHERE << " EventHeader Node missing, doing nothing." << std::endl;
+    return Fun4AllReturnCodes::ABORTRUN;
+  }
+
   bool accept = true;
 
+  /*
   if (m_requireTPCDiffuseLaser)
   {
     accept = accept && laserEventInfo->isLaserEvent();
@@ -45,8 +55,18 @@ int DiffuseLaserEventSelector::process_event(PHCompositeNode* topNode)
   {
     accept = accept && !laserEventInfo->isGl1LaserPileupEvent();
   }
+  */
 
-  if (Verbosity() > 1)
+  if((eventHeader->get_RunNumber() > 66153 && laserEventInfo->isGl1LaserEvent()) || (eventHeader->get_RunNumber() <= 66153 && laserEventInfo->isLaserEvent()))
+  {
+    accept = true;
+  }
+  else
+  {
+    accept = false;
+  }
+
+  /*if (Verbosity() > 1)
   {
     std::cout << "DiffuseLaserEventSelector:"
               << " isLaserEvent = " << laserEventInfo->isLaserEvent()
@@ -55,12 +75,12 @@ int DiffuseLaserEventSelector::process_event(PHCompositeNode* topNode)
               << laserEventInfo->isGl1LaserPileupEvent()
               << " accept = " << accept
               << std::endl;
-  }
+  }*/
 
-  if (accept)
+  if (!accept)
   {
-    return Fun4AllReturnCodes::EVENT_OK;
+    return Fun4AllReturnCodes::ABORTEVENT;
   }
 
-  return Fun4AllReturnCodes::DISCARDEVENT;
+  return Fun4AllReturnCodes::EVENT_OK;
 }
